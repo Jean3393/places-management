@@ -1,12 +1,18 @@
 package br.com.jprojects.placesmanagement.form;
 
+import javax.validation.constraints.NotBlank;
+
 import br.com.jprojects.placesmanagement.model.Place;
 
 public class PlaceForm {
 	
+	@NotBlank
 	private String name;
+	@NotBlank
 	private String slug;
+	@NotBlank
 	private String city;
+	@NotBlank
 	private String state;
 	
 	public PlaceForm(String name, String slug, String city, String state) {

@@ -3,6 +3,8 @@ package br.com.jprojects.placesmanagement.controller;
 import java.net.URI;
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,7 +35,7 @@ public class PlacesController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<PlaceDto> register(@RequestBody PlaceForm form, UriComponentsBuilder uriBuilder){
+	public ResponseEntity<PlaceDto> register(@RequestBody @Valid PlaceForm form, UriComponentsBuilder uriBuilder){
 		Place place = form.converter();
 		placeRepository.save(place);
 		
