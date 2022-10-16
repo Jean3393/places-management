@@ -6,7 +6,7 @@ import br.com.jprojects.placesmanagement.model.Place;
 
 public class PlaceForm {
 	
-	@NotBlank
+	@NotBlank(message = "Insert a name for the place")
 	private String name;
 	@NotBlank
 	private String slug;
