@@ -1,29 +1,25 @@
 package br.com.jprojects.placesmanagement.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import br.com.jprojects.placesmanagement.model.Place;
 
-public class PlaceDto {
+public class UpdatedPlaceDto {
 	
 	private int id;
 	private String name;
 	private String slug;
 	private String city;
 	private String state;
-	private LocalDateTime createdAt;
-	private LocalDateTime updatedAt;
+	private LocalDateTime updated;
 	
-	public PlaceDto(Place place) {
+	public UpdatedPlaceDto(Place place) {
 		this.id = place.getId();
 		this.slug = place.getSlug();
 		this.name = place.getName();
 		this.state = place.getState();
 		this.city = place.getCity();
-		this.createdAt = place.getCreatedAt();
-		this.updatedAt = place.getUpdatedAt();
+		this.updated = place.getUpdatedAt();
 	}
 	
 	
@@ -57,21 +53,11 @@ public class PlaceDto {
 	public void setState(String state) {
 		this.state = state;
 	}
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
+	public LocalDateTime getUpdated() {
+		return updated;
 	}
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-	public static List<PlaceDto> converter(List<Place> places) {
-		List<PlaceDto> placesList = places.stream().map(PlaceDto::new).collect(Collectors.toList());
-		return placesList;
+	public void setUpdated(LocalDateTime updated) {
+		this.updated = updated;
 	}
 
 }
