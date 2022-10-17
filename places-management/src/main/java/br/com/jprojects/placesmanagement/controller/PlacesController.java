@@ -32,11 +32,11 @@ public class PlacesController {
 	private PlaceRepository placeRepository;
 	
 	@GetMapping
-	public List<PlaceDto> getPlaces(){
+	public ResponseEntity<List<PlaceDto>> getPlaces(){
 		List<Place> places = placeRepository.findAll();
 		List<PlaceDto> placesDto = PlaceDto.converter(places);
 		
-		return placesDto;
+		return ResponseEntity.ok(placesDto);
 	}
 	
 	@PostMapping
@@ -50,18 +50,27 @@ public class PlacesController {
 	}
 	
 	@GetMapping("/{id}")
-	public PlaceDto getPlace(@PathVariable Integer id) {
-		Place place = placeRepository.getReferenceById(id);
-		return new PlaceDto(place);
+	public ResponseEntity<PlaceDto> getPlace(@PathVariable Integer id) {
+		if(placeRepository.existsById(id)) {
+			Place place = placeRepository.getReferenceById(id);
+			return ResponseEntity.ok(new PlaceDto(place));
+		}
+		
+		return ResponseEntity.notFound().build();
+		
 	}
 	
 	@PutMapping("/{id}")
 	@Transactional
 	public ResponseEntity<UpdatedPlaceDto> update(@PathVariable Integer id,@RequestBody @Valid UpdatedPlaceForm form) {
-		Place place = form.converter(id, placeRepository);
-		UpdatedPlaceDto dto = new UpdatedPlaceDto(place);
+		if(placeRepository.existsById(id)) {
+			Place place = form.converter(id, placeRepository);
+			UpdatedPlaceDto dto = new UpdatedPlaceDto(place);
+			
+			return ResponseEntity.ok(dto);
+		}
 		
-		return ResponseEntity.ok(dto);
+		return ResponseEntity.notFound().build();
 	}
 
 }
