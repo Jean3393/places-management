@@ -1,8 +1,8 @@
 package br.com.jprojects.placesmanagement.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
 
 import br.com.jprojects.placesmanagement.model.Place;
 
@@ -69,8 +69,8 @@ public class PlaceDto {
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-	public static List<PlaceDto> converter(List<Place> places) {
-		List<PlaceDto> placesList = places.stream().map(PlaceDto::new).collect(Collectors.toList());
+	public static Page<PlaceDto> converter(Page<Place> places) {
+		Page<PlaceDto> placesList = places.map(PlaceDto::new);
 		return placesList;
 	}
 

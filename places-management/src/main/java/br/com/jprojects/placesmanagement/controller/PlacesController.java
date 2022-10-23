@@ -1,11 +1,13 @@
 package br.com.jprojects.placesmanagement.controller;
 
 import java.net.URI;
-import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -25,16 +28,23 @@ import br.com.jprojects.placesmanagement.model.Place;
 import br.com.jprojects.placesmanagement.repository.PlaceRepository;
 
 @RestController
-@RequestMapping("places")
+@RequestMapping("api/places")
 public class PlacesController {
 	
 	@Autowired
 	private PlaceRepository placeRepository;
 	
 	@GetMapping
-	public ResponseEntity<List<PlaceDto>> getPlaces(){
-		List<Place> places = placeRepository.findAll();
-		List<PlaceDto> placesDto = PlaceDto.converter(places);
+	public ResponseEntity<Page<PlaceDto>> getPlaces(@RequestParam(required = false) String name,@PageableDefault(page = 0, size = 10) Pageable pageable){
+		
+		if(name == null || name.isEmpty()) {
+			Page<Place> places = placeRepository.findAll(pageable);
+			Page<PlaceDto> placesDto = PlaceDto.converter(places);
+			
+			return ResponseEntity.ok(placesDto);
+		}
+		Page<Place> places = placeRepository.findByName(name, pageable);
+		Page<PlaceDto> placesDto = PlaceDto.converter(places);
 		
 		return ResponseEntity.ok(placesDto);
 	}
@@ -44,7 +54,7 @@ public class PlacesController {
 		Place place = form.converter();
 		placeRepository.save(place);
 		
-		URI uri = uriBuilder.path("/places/{id}").buildAndExpand(place.getId()).toUri();
+		URI uri = uriBuilder.path("/api/places/{id}").buildAndExpand(place.getId()).toUri();
 		return ResponseEntity.created(uri).body(new PlaceDto(place));
 		
 	}
