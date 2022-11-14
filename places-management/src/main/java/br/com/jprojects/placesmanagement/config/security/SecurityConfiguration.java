@@ -12,12 +12,21 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import br.com.jprojects.placesmanagement.repository.UserRepository;
 
 @Configuration
 public class SecurityConfiguration {
 	
 	@Autowired
 	private AuthenticationService authenticationService;
+	
+	@Autowired
+	private TokenService tokenService;
+	
+	@Autowired
+	private UserRepository userRepository;
 	
 	@Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -29,6 +38,7 @@ public class SecurityConfiguration {
                 .anyRequest().authenticated()
             )
             .httpBasic().and().csrf().disable()
+            .addFilterBefore(new AuthenticationTokenFilter(tokenService, userRepository), UsernamePasswordAuthenticationFilter.class)
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         return http.build();
     }

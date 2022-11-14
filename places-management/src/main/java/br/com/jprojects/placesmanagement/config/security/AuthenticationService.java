@@ -9,13 +9,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import br.com.jprojects.placesmanagement.model.User;
-import br.com.jprojects.placesmanagement.repository.UsuarioRepository;
+import br.com.jprojects.placesmanagement.repository.UserRepository;
 
 @Service
 public class AuthenticationService implements UserDetailsService{
 	
 	@Autowired
-	private UsuarioRepository usuarioRepository;
+	private UserRepository usuarioRepository;
 
 	@Override
 	public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
