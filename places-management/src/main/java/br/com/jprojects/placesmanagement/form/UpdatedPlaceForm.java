@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import javax.validation.constraints.NotBlank;
 
 import br.com.jprojects.placesmanagement.model.Place;
-import br.com.jprojects.placesmanagement.repository.PlaceRepository;
+import br.com.jprojects.placesmanagement.service.PlaceService;
 
 public class UpdatedPlaceForm {
 	
@@ -66,8 +66,8 @@ public class UpdatedPlaceForm {
 		this.update = update;
 	}
 	
-	public Place converter(Integer id, PlaceRepository repository) {
-		Place place = repository.getReferenceById(id);
+	public Place converter(Integer id, PlaceService placeService) {
+		Place place = placeService.getPlaceById(id);
 		place.setName(this.name);
 		place.setSlug(this.slug);
 		place.setCity(this.city);
