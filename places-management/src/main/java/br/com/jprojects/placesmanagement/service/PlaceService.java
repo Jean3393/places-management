@@ -20,8 +20,8 @@ public class PlaceService {
 		this.placeRepository = placeRepository;
 	}
 	
-	public void save(Place place) {
-		placeRepository.save(place);
+	public Place save(Place place) {
+		return placeRepository.save(place);
 	}
 	
 	public Page<Place> findAll(Pageable pageable) {
