@@ -1,6 +1,7 @@
 package br.com.jprojects.placesmanagement.controller;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
 
 import javax.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -34,15 +36,15 @@ public class PlaceController {
 	@Autowired
 	private PlaceService placeService;
 	
-	@GetMapping("/{name}")
-	public ResponseEntity<Page<PlaceDto>> getPlaceByName(@PathVariable String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws Exception{
+	@GetMapping(params = "name")
+	public ResponseEntity<List<PlaceDto>> getPlaceByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws Exception{
 		
-		Optional<Page<Place>> place = placeService.findByName(name, pageable);
-		if(place.isEmpty()) {
-			throw new Exception("No place was found with this name.");
+		Optional<List<Place>> place = placeService.findByName(name, pageable);
+		if(place.get().isEmpty()) {
+			return ResponseEntity.notFound().build();
 		}
 		
-		Page<PlaceDto> placeDto = PlaceDto.converter(place.get());
+		List<PlaceDto> placeDto = PlaceDto.listConverter(place.get());
 		return ResponseEntity.ok(placeDto);
 		
 	}
@@ -50,7 +52,7 @@ public class PlaceController {
 	@GetMapping
 	public ResponseEntity<Page<PlaceDto>> getAll(@PageableDefault(page = 0, size = 10) Pageable pageable){
 		Page<Place> places = placeService.findAll(pageable);
-		Page<PlaceDto> dto = PlaceDto.converter(places);
+		Page<PlaceDto> dto = PlaceDto.pageConverter(places);
 		return ResponseEntity.ok(dto);
 	}
 	
@@ -66,8 +68,9 @@ public class PlaceController {
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<PlaceDto> getPlace(@PathVariable Integer id) {
-		if(placeService.existsById(id)) {
-			Place place = placeService.getPlaceById(id);
+		int realId = id.intValue();
+		if(placeService.existsById(realId)) {
+			Place place = placeService.getPlaceById(realId);
 			return ResponseEntity.ok(new PlaceDto(place));
 		}
 		

@@ -1,11 +1,12 @@
 package br.com.jprojects.placesmanagement.service;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -30,7 +31,7 @@ class PlaceServiceTest {
 
 	@Test
 	void saveTest() {
-		Place place = new Place(anyString(), "Bar", anyString(), anyString());
+		Place place = new Place("", "Bar", "", "");
 		
 		when(repository.save(Mockito.any(Place.class))).thenReturn(place);
 		
@@ -52,6 +53,21 @@ class PlaceServiceTest {
 		
 		assertNotNull(testPlaces);
 		assertEquals(testPlaces.getSize(), 1);
+	}
+	
+	@Test
+	void findByNameTest() {
+		List<Place> places = new ArrayList<>();
+		places.add(new Place("Foo", "", "", ""));
+		Optional<List<Place>> list = Optional.of(places);
+		Pageable pageable = Pageable.ofSize(1);
+		
+		when(repository.findByName(Mockito.anyString(), Mockito.any(Pageable.class))).thenReturn(list);
+		
+		Optional<List<Place>> listTest = repository.findByName("", pageable);
+		Place test = listTest.get().get(0);
+		
+		assertEquals("Foo", test.getName());
 	}
 
 }

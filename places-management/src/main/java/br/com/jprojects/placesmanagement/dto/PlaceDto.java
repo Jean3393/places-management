@@ -1,6 +1,8 @@
 package br.com.jprojects.placesmanagement.dto;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.data.domain.Page;
 
@@ -69,7 +71,12 @@ public class PlaceDto {
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-	public static Page<PlaceDto> converter(Page<Place> places) {
+	public static List<PlaceDto> listConverter(List<Place> places) {
+		List<PlaceDto> placesList = new ArrayList<>();
+		places.forEach(l ->  placesList.add(new PlaceDto(l)));
+		return placesList;
+	}
+	public static Page<PlaceDto> pageConverter(Page<Place> places) {
 		Page<PlaceDto> placesList = places.map(PlaceDto::new);
 		return placesList;
 	}
