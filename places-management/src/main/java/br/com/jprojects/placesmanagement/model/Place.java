@@ -7,6 +7,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.modelmapper.ModelMapper;
+
+import br.com.jprojects.placesmanagement.dto.PlaceDto;
+
 @Entity
 public class Place {
 	
@@ -31,11 +35,22 @@ public class Place {
 		this.city = city;
 		this.state = state;
 	}
+	
+	public Place(Integer id, String name, String slug, String city, String state) {
+		this.id = id;
+		this.name = name;
+		this.slug = slug;
+		this.city = city;
+		this.state = state;
+	}
 
 
 
 	public Integer getId() {
 		return id;
+	}
+	public void setId(Integer id) {
+		this.id = id;
 	}
 	public String getName() {
 		return name;
@@ -69,6 +84,10 @@ public class Place {
 	}
 	public void setUpdatedAt(LocalDateTime updatedAt) {
 		this.updatedAt = updatedAt;
+	}
+	
+	public PlaceDto convertEntityToDto() {
+		return new ModelMapper().map(this, PlaceDto.class);
 	}
 
 }

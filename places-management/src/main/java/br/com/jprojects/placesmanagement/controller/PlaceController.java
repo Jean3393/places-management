@@ -1,6 +1,7 @@
 package br.com.jprojects.placesmanagement.controller;
 
 import java.net.URI;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,9 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.jprojects.placesmanagement.dto.PlaceDto;
-import br.com.jprojects.placesmanagement.dto.UpdatedPlaceDto;
-import br.com.jprojects.placesmanagement.form.PlaceForm;
-import br.com.jprojects.placesmanagement.form.UpdatedPlaceForm;
 import br.com.jprojects.placesmanagement.model.Place;
 import br.com.jprojects.placesmanagement.service.PlaceService;
 
@@ -37,7 +35,7 @@ public class PlaceController {
 	private PlaceService placeService;
 	
 	@GetMapping(params = "name")
-	public ResponseEntity<List<PlaceDto>> getPlaceByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws Exception{
+	public ResponseEntity<List<PlaceDto>> getByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws Exception{
 		
 		Optional<List<Place>> place = placeService.findByName(name, pageable);
 		if(place.get().isEmpty()) {
@@ -57,20 +55,21 @@ public class PlaceController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<PlaceDto> register(@RequestBody @Valid PlaceForm form, UriComponentsBuilder uriBuilder){
-		Place place = form.converter();
-		placeService.save(place);
+	public ResponseEntity<PlaceDto> save(@RequestBody @Valid PlaceDto dto, UriComponentsBuilder uriBuilder){
+		Place place = dto.convertDtoToEntity();
+		Place savedPlace = placeService.save(place);
+		
+		PlaceDto savedDto = new PlaceDto(savedPlace);
 		
 		URI uri = uriBuilder.path("/api/places/{id}").buildAndExpand(place.getId()).toUri();
-		return ResponseEntity.created(uri).body(new PlaceDto(place));
+		return ResponseEntity.created(uri).body(savedDto);
 		
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<PlaceDto> getPlace(@PathVariable Integer id) {
-		int realId = id.intValue();
-		if(placeService.existsById(realId)) {
-			Place place = placeService.getPlaceById(realId);
+	public ResponseEntity<PlaceDto> getById(@PathVariable Integer id) {
+		if(placeService.existsById(id)) {
+			Place place = placeService.getPlaceById(id);
 			return ResponseEntity.ok(new PlaceDto(place));
 		}
 		
@@ -80,12 +79,16 @@ public class PlaceController {
 	
 	@PutMapping("/{id}")
 	@Transactional
-	public ResponseEntity<UpdatedPlaceDto> update(@PathVariable Integer id,@RequestBody @Valid UpdatedPlaceForm form) {
+	public ResponseEntity<PlaceDto> update(@PathVariable Integer id,@RequestBody @Valid PlaceDto dto) {
 		if(placeService.existsById(id)) {
-			Place place = form.converter(id, placeService);
-			UpdatedPlaceDto dto = new UpdatedPlaceDto(place);
+			dto.setId(id);
 			
-			return ResponseEntity.ok(dto);
+			Place placeToUpdate = placeService.getPlaceById(id);
+			placeToUpdate.setUpdatedAt(LocalDateTime.now());
+			placeService.save(placeToUpdate);
+			PlaceDto updatedDto = new PlaceDto(placeToUpdate);
+			
+			return ResponseEntity.ok(updatedDto);
 		}
 		
 		return ResponseEntity.notFound().build();

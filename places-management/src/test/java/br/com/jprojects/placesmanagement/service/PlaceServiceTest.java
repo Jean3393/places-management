@@ -1,20 +1,14 @@
 package br.com.jprojects.placesmanagement.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import br.com.jprojects.placesmanagement.model.Place;
@@ -28,46 +22,43 @@ class PlaceServiceTest {
 	
 	@MockBean
 	private PlaceRepository repository;
+	
+	@Mock
+	private Pageable pageable;
 
+	
 	@Test
 	void saveTest() {
-		Place place = new Place("", "Bar", "", "");
+		//given
+		Place place = new Place("Name", "Bar", "City", "State");
 		
-		when(repository.save(Mockito.any(Place.class))).thenReturn(place);
+		//when
+		service.save(place);
 		
-		Place testPlace = service.save(new Place());
+		//then
+		ArgumentCaptor<Place> placeArgumentCaptor = ArgumentCaptor.forClass(Place.class);
 		
-		assertNotNull(testPlace);
-		assertEquals("Bar", testPlace.getSlug());
+		verify(repository).save(placeArgumentCaptor.capture());
+		
+		Place placeCaptured = placeArgumentCaptor.getValue();
+		
+		assertEquals(place, placeCaptured);
 	}
 	
 	@Test
 	void findAllTest() {
-		List<Place> places = new ArrayList<>();
-		Pageable pageable = Pageable.ofSize(1);
-		Page<Place> page = new PageImpl<>(places, pageable, 1);
+		//when
+		service.findAll(pageable);
 		
-		when(repository.findAll(Mockito.any(Pageable.class))).thenReturn(page);
-		
-		Page<Place> testPlaces = service.findAll(pageable);
-		
-		assertNotNull(testPlaces);
-		assertEquals(testPlaces.getSize(), 1);
+		//then
+		verify(repository).findAll(pageable);
 	}
 	
 	@Test
 	void findByNameTest() {
-		List<Place> places = new ArrayList<>();
-		places.add(new Place("Foo", "", "", ""));
-		Optional<List<Place>> list = Optional.of(places);
-		Pageable pageable = Pageable.ofSize(1);
+		service.findByName("", pageable);
 		
-		when(repository.findByName(Mockito.anyString(), Mockito.any(Pageable.class))).thenReturn(list);
-		
-		Optional<List<Place>> listTest = repository.findByName("", pageable);
-		Place test = listTest.get().get(0);
-		
-		assertEquals("Foo", test.getName());
+		verify(repository).findByName("", pageable);
 	}
 
 }
