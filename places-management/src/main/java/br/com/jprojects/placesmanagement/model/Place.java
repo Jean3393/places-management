@@ -89,5 +89,14 @@ public class Place {
 	public PlaceDto convertEntityToDto() {
 		return new ModelMapper().map(this, PlaceDto.class);
 	}
+	
+	public void updatePlace(PlaceDto dto) {
+		setId(dto.getId());
+		setName(dto.getName());
+		setSlug(dto.getSlug());
+		setCity(dto.getCity());
+		setState(dto.getState());
+		setUpdatedAt(LocalDateTime.now());
+	}
 
 }

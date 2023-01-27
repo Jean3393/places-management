@@ -1,7 +1,6 @@
 package br.com.jprojects.placesmanagement.controller;
 
 import java.net.URI;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -84,7 +83,7 @@ public class PlaceController {
 			dto.setId(id);
 			
 			Place placeToUpdate = placeService.getPlaceById(id);
-			placeToUpdate.setUpdatedAt(LocalDateTime.now());
+			placeToUpdate.updatePlace(dto);
 			placeService.save(placeToUpdate);
 			PlaceDto updatedDto = new PlaceDto(placeToUpdate);
 			
