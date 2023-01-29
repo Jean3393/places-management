@@ -61,24 +61,46 @@ class PlaceControllerTest {
 		Place place = getMockPlace();
 		List<Place> list = new ArrayList<>();
 		list.add(place);
+
 		pageable = Pageable.ofSize(10);
 		Optional<List<Place>> optionalPlace = Optional.of(list);
+
 		when(service.findByName("Name", pageable)).thenReturn(optionalPlace);
 
 		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL.concat("?name=Name"))))
-				.andExpect(MockMvcResultMatchers.status().isOk());
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value(NAME));
+	}
+	
+	@Test
+	void shouldReturnNotFoundResponseWhenSearchingForANonExistingName() throws Exception {
+		List<Place> list = new ArrayList<>();
+
+		pageable = Pageable.ofSize(10);
+		Optional<List<Place>> optionalPlace = Optional.of(list);
+
+		when(service.findByName("Name", pageable)).thenReturn(optionalPlace);
+
+		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL.concat("?name=Name"))))
+				.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
 
 	@Test
 	void testGetAll() throws Exception {
 		List<Place> list = new ArrayList<>();
+		Place secondPlace = getMockPlace();
+		secondPlace.setName("Other");
 		list.add(getMockPlace());
+		list.add(secondPlace);
+
 		pageable = Pageable.ofSize(10);
 		Page<Place> page = new PageImpl<>(list, pageable, 0);
+
 		when(service.findAll(pageable)).thenReturn(page);
 
-		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL)))
-				.andExpect(MockMvcResultMatchers.status().isOk());
+		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL))).andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.content[0].name").value(NAME))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.content[1].name").value("Other"));
 	}
 
 	@Test
@@ -89,8 +111,12 @@ class PlaceControllerTest {
 		MockMvc.perform(
 				MockMvcRequestBuilders.post(URI.create(URL)).content(getJsonPayload(ID, NAME, SLUG, CITY, STATE))
 						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
-//		.andDo(MockMvcResultHandlers.print())
-				.andExpect(MockMvcResultMatchers.status().isCreated());
+				.andExpect(MockMvcResultMatchers.status().isCreated())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(ID))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value(NAME))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.slug").value(SLUG))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.city").value(CITY))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.state").value(STATE));
 	}
 
 	@Test
@@ -100,22 +126,42 @@ class PlaceControllerTest {
 		when(service.getPlaceById(anyInt())).thenReturn(place);
 
 		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL + "/1")))
-				.andExpect(MockMvcResultMatchers.status().isOk());
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(ID));
 
+	}
+	
+	@Test
+	void shouldReturnNotFoundResponseWhenSearchingForANonExistingId() throws Exception {
+		when(service.existsById(anyInt())).thenReturn(false);
+
+		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL + "/1")))
+				.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
 
 	@Test
 	void testUpdate() throws Exception {
 		Place updatedPlace = getMockPlace();
 		updatedPlace.setCity("Updated City");
+
 		when(service.existsById(anyInt())).thenReturn(true);
 		when(service.getPlaceById(anyInt())).thenReturn(updatedPlace);
 		when(service.save(any(Place.class))).thenReturn(updatedPlace);
 
-		MockMvc.perform(MockMvcRequestBuilders.put(URI.create(URL.concat("/1")))
-				.content(getJsonPayload(ID, NAME, SLUG, CITY, STATE)).contentType(MediaType.APPLICATION_JSON)
-				.accept(MediaType.APPLICATION_JSON)).andExpect(MockMvcResultMatchers.status().isOk());
+		MockMvc.perform(MockMvcRequestBuilders.put(URI.create(URL.concat("/1"))).content(getJsonPayload(updatedPlace))
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isOk())
+				.andExpect(MockMvcResultMatchers.jsonPath("$.city").value("Updated City"));
 
+	}
+	
+	@Test
+	void shouldReturnNotFoundResponseWhenUpdatingANonExistingId() throws Exception {
+		when(service.existsById(anyInt())).thenReturn(false);
+
+		MockMvc.perform(MockMvcRequestBuilders.put(URI.create(URL.concat("/1"))).content(getJsonPayload(getMockPlace()))
+				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+				.andExpect(MockMvcResultMatchers.status().isNotFound());
 	}
 
 	private Place getMockPlace() {
@@ -125,6 +171,14 @@ class PlaceControllerTest {
 	private String getJsonPayload(Integer id, String name, String slug, String city, String state)
 			throws JsonProcessingException {
 		Place place = new Place(id, name, slug, city, state);
+		PlaceDto dto = new PlaceDto(place);
+
+		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());
+
+		return mapper.writeValueAsString(dto);
+	}
+
+	private String getJsonPayload(Place place) throws JsonProcessingException {
 		PlaceDto dto = new PlaceDto(place);
 
 		ObjectMapper mapper = new ObjectMapper().registerModule(new JavaTimeModule());

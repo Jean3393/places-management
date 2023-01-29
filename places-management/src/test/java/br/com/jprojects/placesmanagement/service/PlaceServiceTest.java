@@ -1,6 +1,7 @@
 package br.com.jprojects.placesmanagement.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.Test;
@@ -59,6 +60,20 @@ class PlaceServiceTest {
 		service.findByName("", pageable);
 		
 		verify(repository).findByName("", pageable);
+	}
+	
+	@Test
+	void existsById() {
+		service.existsById(anyInt());
+		
+		verify(repository).existsById(anyInt());
+	}
+	
+	@Test
+	void getPlaceById() {
+		service.getPlaceById(anyInt());
+		
+		verify(repository).getReferenceById(anyInt());
 	}
 
 }
