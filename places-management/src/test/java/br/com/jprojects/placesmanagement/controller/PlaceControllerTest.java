@@ -28,7 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-import br.com.jprojects.placesmanagement.dto.PlaceDto;
+import br.com.jprojects.placesmanagement.dto.model.PlaceDto;
 import br.com.jprojects.placesmanagement.model.Place;
 import br.com.jprojects.placesmanagement.service.PlaceService;
 
@@ -69,7 +69,7 @@ class PlaceControllerTest {
 
 		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL.concat("?name=Name"))))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value(NAME));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.[0].name").value(NAME));
 	}
 	
 	@Test
@@ -99,8 +99,8 @@ class PlaceControllerTest {
 		when(service.findAll(pageable)).thenReturn(page);
 
 		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL))).andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.content[0].name").value(NAME))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.content[1].name").value("Other"));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.content[0].name").value(NAME))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.content[1].name").value("Other"));
 	}
 
 	@Test
@@ -112,11 +112,11 @@ class PlaceControllerTest {
 				MockMvcRequestBuilders.post(URI.create(URL)).content(getJsonPayload(ID, NAME, SLUG, CITY, STATE))
 						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isCreated())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(ID))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.name").value(NAME))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.slug").value(SLUG))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.city").value(CITY))
-				.andExpect(MockMvcResultMatchers.jsonPath("$.state").value(STATE));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(ID))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.name").value(NAME))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.slug").value(SLUG))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.city").value(CITY))
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.state").value(STATE));
 	}
 
 	@Test
@@ -127,7 +127,7 @@ class PlaceControllerTest {
 
 		MockMvc.perform(MockMvcRequestBuilders.get(URI.create(URL + "/1")))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.id").value(ID));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.id").value(ID));
 
 	}
 	
@@ -151,7 +151,7 @@ class PlaceControllerTest {
 		MockMvc.perform(MockMvcRequestBuilders.put(URI.create(URL.concat("/1"))).content(getJsonPayload(updatedPlace))
 				.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
 				.andExpect(MockMvcResultMatchers.status().isOk())
-				.andExpect(MockMvcResultMatchers.jsonPath("$.city").value("Updated City"));
+				.andExpect(MockMvcResultMatchers.jsonPath("$.data.city").value("Updated City"));
 
 	}
 	

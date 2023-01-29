@@ -9,7 +9,7 @@ import javax.persistence.Id;
 
 import org.modelmapper.ModelMapper;
 
-import br.com.jprojects.placesmanagement.dto.PlaceDto;
+import br.com.jprojects.placesmanagement.dto.model.PlaceDto;
 
 @Entity
 public class Place {

@@ -1,4 +1,4 @@
-package br.com.jprojects.placesmanagement.dto;
+package br.com.jprojects.placesmanagement.dto.model;
 
 import java.time.LocalDateTime;
 

@@ -22,7 +22,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import br.com.jprojects.placesmanagement.dto.PlaceDto;
+import br.com.jprojects.placesmanagement.dto.model.PlaceDto;
+import br.com.jprojects.placesmanagement.dto.response.Response;
 import br.com.jprojects.placesmanagement.model.Place;
 import br.com.jprojects.placesmanagement.service.PlaceService;
 
@@ -34,7 +35,9 @@ public class PlaceController {
 	private PlaceService placeService;
 	
 	@GetMapping(params = "name")
-	public ResponseEntity<List<PlaceDto>> getByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws Exception{
+	public ResponseEntity<Response<List<PlaceDto>>> getByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws Exception{
+		
+		Response<List<PlaceDto>> response = new Response<>();
 		
 		Optional<List<Place>> place = placeService.findByName(name, pageable);
 		if(place.get().isEmpty()) {
@@ -42,34 +45,51 @@ public class PlaceController {
 		}
 		
 		List<PlaceDto> placeDto = PlaceDto.listConverter(place.get());
-		return ResponseEntity.ok(placeDto);
+		response.setData(placeDto);
+		return ResponseEntity.ok(response);
 		
 	}
 	
 	@GetMapping
-	public ResponseEntity<Page<PlaceDto>> getAll(@PageableDefault(page = 0, size = 10) Pageable pageable){
+	public ResponseEntity<Response<Page<PlaceDto>>> getAll(@PageableDefault(page = 0, size = 10) Pageable pageable){
+		
+		Response<Page<PlaceDto>> response = new Response<>();
+		
 		Page<Place> places = placeService.findAll(pageable);
 		Page<PlaceDto> dto = PlaceDto.pageConverter(places);
-		return ResponseEntity.ok(dto);
+		
+		response.setData(dto);
+		return ResponseEntity.ok(response);
 	}
 	
 	@PostMapping
-	public ResponseEntity<PlaceDto> save(@RequestBody @Valid PlaceDto dto, UriComponentsBuilder uriBuilder){
+	public ResponseEntity<Response<PlaceDto>> save(@RequestBody @Valid PlaceDto dto, UriComponentsBuilder uriBuilder){
+		
+		Response<PlaceDto> response = new Response<>();
+		
 		Place place = dto.convertDtoToEntity();
 		Place savedPlace = placeService.save(place);
 		
 		PlaceDto savedDto = new PlaceDto(savedPlace);
 		
 		URI uri = uriBuilder.path("/api/places/{id}").buildAndExpand(place.getId()).toUri();
-		return ResponseEntity.created(uri).body(savedDto);
+		
+		response.setData(savedDto);
+		return ResponseEntity.created(uri).body(response);
 		
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<PlaceDto> getById(@PathVariable Integer id) {
+	public ResponseEntity<Response<PlaceDto>> getById(@PathVariable Integer id) {
+		
+		Response<PlaceDto> response = new Response<>();
+		
 		if(placeService.existsById(id)) {
 			Place place = placeService.getPlaceById(id);
-			return ResponseEntity.ok(new PlaceDto(place));
+			PlaceDto dto = new PlaceDto(place);
+			
+			response.setData(dto);
+			return ResponseEntity.ok(response);
 		}
 		
 		return ResponseEntity.notFound().build();
@@ -78,7 +98,10 @@ public class PlaceController {
 	
 	@PutMapping("/{id}")
 	@Transactional
-	public ResponseEntity<PlaceDto> update(@PathVariable Integer id,@RequestBody @Valid PlaceDto dto) {
+	public ResponseEntity<Response<PlaceDto>> update(@PathVariable Integer id,@RequestBody @Valid PlaceDto dto) {
+		
+		Response<PlaceDto> response = new Response<>();
+		
 		if(placeService.existsById(id)) {
 			dto.setId(id);
 			
@@ -87,7 +110,8 @@ public class PlaceController {
 			placeService.save(placeToUpdate);
 			PlaceDto updatedDto = new PlaceDto(placeToUpdate);
 			
-			return ResponseEntity.ok(updatedDto);
+			response.setData(updatedDto);
+			return ResponseEntity.ok(response);
 		}
 		
 		return ResponseEntity.notFound().build();
