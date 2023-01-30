@@ -118,6 +118,17 @@ class PlaceControllerTest {
 				.andExpect(MockMvcResultMatchers.jsonPath("$.data.city").value(CITY))
 				.andExpect(MockMvcResultMatchers.jsonPath("$.data.state").value(STATE));
 	}
+	
+	@Test
+	void shouldThrowInvalidPlaceException() throws Exception {
+		when(service.save(any(Place.class))).thenReturn(getMockPlace());
+		
+		MockMvc.perform(
+				MockMvcRequestBuilders.post(URI.create(URL)).content(getJsonPayload(ID, null, SLUG, CITY, STATE))
+						.contentType(MediaType.APPLICATION_JSON).accept(MediaType.APPLICATION_JSON))
+		.andExpect(MockMvcResultMatchers.status().isBadRequest())
+		.andExpect(MockMvcResultMatchers.jsonPath("$.errors[0].details").value("Insert a name for the place."));
+	}
 
 	@Test
 	void testGetById() throws Exception {

@@ -14,13 +14,13 @@ import br.com.jprojects.placesmanagement.model.Place;
 public class PlaceDto {
 	
 	private int id;
-	@NotBlank(message = "Insert a name for the place")
+	@NotBlank(message = "Insert a name for the place.")
 	private String name;
-	@NotBlank(message = "Insert the slug of the place")
+	@NotBlank(message = "Insert the slug of the place.")
 	private String slug;
-	@NotBlank(message = "Insert the name of the city the place is in")
+	@NotBlank(message = "Insert the name of the city the place is in.")
 	private String city;
-	@NotBlank(message = "Insert the name of the state of the city")
+	@NotBlank(message = "Insert the name of the state of the city.")
 	private String state;
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;

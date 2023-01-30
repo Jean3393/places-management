@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,6 +25,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.jprojects.placesmanagement.dto.model.PlaceDto;
 import br.com.jprojects.placesmanagement.dto.response.Response;
+import br.com.jprojects.placesmanagement.exception.InvalidPlaceException;
+import br.com.jprojects.placesmanagement.exception.PlaceNotFoundException;
 import br.com.jprojects.placesmanagement.model.Place;
 import br.com.jprojects.placesmanagement.service.PlaceService;
 
@@ -35,13 +38,13 @@ public class PlaceController {
 	private PlaceService placeService;
 	
 	@GetMapping(params = "name")
-	public ResponseEntity<Response<List<PlaceDto>>> getByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws Exception{
+	public ResponseEntity<Response<List<PlaceDto>>> getByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws PlaceNotFoundException{
 		
 		Response<List<PlaceDto>> response = new Response<>();
 		
 		Optional<List<Place>> place = placeService.findByName(name, pageable);
 		if(place.get().isEmpty()) {
-			return ResponseEntity.notFound().build();
+			throw new PlaceNotFoundException("No place was found with the name: " + name);
 		}
 		
 		List<PlaceDto> placeDto = PlaceDto.listConverter(place.get());
@@ -63,9 +66,13 @@ public class PlaceController {
 	}
 	
 	@PostMapping
-	public ResponseEntity<Response<PlaceDto>> save(@RequestBody @Valid PlaceDto dto, UriComponentsBuilder uriBuilder){
+	public ResponseEntity<Response<PlaceDto>> save(@RequestBody @Valid PlaceDto dto, BindingResult result, UriComponentsBuilder uriBuilder) throws InvalidPlaceException {
 		
 		Response<PlaceDto> response = new Response<>();
+		
+		if(result.hasErrors()) {
+			throw new InvalidPlaceException(result);
+		}
 		
 		Place place = dto.convertDtoToEntity();
 		Place savedPlace = placeService.save(place);
@@ -80,41 +87,41 @@ public class PlaceController {
 	}
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Response<PlaceDto>> getById(@PathVariable Integer id) {
+	public ResponseEntity<Response<PlaceDto>> getById(@PathVariable Integer id) throws PlaceNotFoundException {
 		
 		Response<PlaceDto> response = new Response<>();
 		
-		if(placeService.existsById(id)) {
-			Place place = placeService.getPlaceById(id);
-			PlaceDto dto = new PlaceDto(place);
-			
-			response.setData(dto);
-			return ResponseEntity.ok(response);
+		if(!placeService.existsById(id)) {
+			throw new PlaceNotFoundException("No place was found with the id: " + id);
 		}
 		
-		return ResponseEntity.notFound().build();
+		Place place = placeService.getPlaceById(id);
+		PlaceDto dto = new PlaceDto(place);
+		
+		response.setData(dto);
+		return ResponseEntity.ok(response);
 		
 	}
 	
 	@PutMapping("/{id}")
 	@Transactional
-	public ResponseEntity<Response<PlaceDto>> update(@PathVariable Integer id,@RequestBody @Valid PlaceDto dto) {
+	public ResponseEntity<Response<PlaceDto>> update(@PathVariable Integer id,@RequestBody @Valid PlaceDto dto) throws PlaceNotFoundException {
 		
 		Response<PlaceDto> response = new Response<>();
 		
-		if(placeService.existsById(id)) {
-			dto.setId(id);
-			
-			Place placeToUpdate = placeService.getPlaceById(id);
-			placeToUpdate.updatePlace(dto);
-			placeService.save(placeToUpdate);
-			PlaceDto updatedDto = new PlaceDto(placeToUpdate);
-			
-			response.setData(updatedDto);
-			return ResponseEntity.ok(response);
+		if(!placeService.existsById(id)) {
+			throw new PlaceNotFoundException("No place was found with the id: " + id);
 		}
 		
-		return ResponseEntity.notFound().build();
+		dto.setId(id);
+		
+		Place placeToUpdate = placeService.getPlaceById(id);
+		placeToUpdate.updatePlace(dto);
+		placeService.save(placeToUpdate);
+		PlaceDto updatedDto = new PlaceDto(placeToUpdate);
+		
+		response.setData(updatedDto);
+		return ResponseEntity.ok(response);
 	}
 
 }
