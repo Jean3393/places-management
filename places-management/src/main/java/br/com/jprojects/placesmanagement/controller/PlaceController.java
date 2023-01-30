@@ -29,6 +29,7 @@ import br.com.jprojects.placesmanagement.exception.InvalidPlaceException;
 import br.com.jprojects.placesmanagement.exception.PlaceNotFoundException;
 import br.com.jprojects.placesmanagement.model.Place;
 import br.com.jprojects.placesmanagement.service.PlaceService;
+import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("api/places")
@@ -38,6 +39,7 @@ public class PlaceController {
 	private PlaceService placeService;
 	
 	@GetMapping(params = "name")
+	@ApiOperation(value = "Route to find a place by it's name on the API")
 	public ResponseEntity<Response<List<PlaceDto>>> getByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws PlaceNotFoundException{
 		
 		Response<List<PlaceDto>> response = new Response<>();
@@ -54,6 +56,7 @@ public class PlaceController {
 	}
 	
 	@GetMapping
+	@ApiOperation(value = "Route to find all places of the API")
 	public ResponseEntity<Response<Page<PlaceDto>>> getAll(@PageableDefault(page = 0, size = 10) Pageable pageable){
 		
 		Response<Page<PlaceDto>> response = new Response<>();
@@ -66,6 +69,7 @@ public class PlaceController {
 	}
 	
 	@PostMapping
+	@ApiOperation(value = "Route to create places")
 	public ResponseEntity<Response<PlaceDto>> save(@RequestBody @Valid PlaceDto dto, BindingResult result, UriComponentsBuilder uriBuilder) throws InvalidPlaceException {
 		
 		Response<PlaceDto> response = new Response<>();
@@ -87,6 +91,7 @@ public class PlaceController {
 	}
 	
 	@GetMapping("/{id}")
+	@ApiOperation(value = "Route to find a place by it's id on the API")
 	public ResponseEntity<Response<PlaceDto>> getById(@PathVariable Integer id) throws PlaceNotFoundException {
 		
 		Response<PlaceDto> response = new Response<>();
@@ -104,6 +109,7 @@ public class PlaceController {
 	}
 	
 	@PutMapping("/{id}")
+	@ApiOperation(value = "Route to update a place")
 	@Transactional
 	public ResponseEntity<Response<PlaceDto>> update(@PathVariable Integer id,@RequestBody @Valid PlaceDto dto) throws PlaceNotFoundException {
 		
