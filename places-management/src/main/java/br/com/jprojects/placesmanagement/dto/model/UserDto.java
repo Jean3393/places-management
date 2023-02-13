@@ -8,12 +8,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
+import org.modelmapper.ModelMapper;
 
 import br.com.jprojects.placesmanagement.model.User;
 
 public class UserDto {
 	
-	private Integer id;
+	private int id;
 	@NotBlank(message = "Name cannot be null.")
 	private String name;
 	@NotBlank(message = "Password cannot be null.")
@@ -25,6 +26,8 @@ public class UserDto {
 	@NotBlank(message = "The user role cannot be null.")
 	@Pattern(regexp = "^(ROLE_ADMIN|ROLE_USER)$", message = "Use only 'ROLE_ADMIN' or 'ROLE_USER' values.")
 	private String role;
+	
+	public UserDto() {}
 
 	public UserDto(String name, String password, String email, String role) {
 		this.name = name;
@@ -85,6 +88,10 @@ public class UserDto {
 		users.stream().forEach(user -> userList.add(new UserDto(user)));
 		
 		return userList;
+	}
+	
+	public User convertDtoToEntity() {
+		return new ModelMapper().map(this, User.class);
 	}
 
 }

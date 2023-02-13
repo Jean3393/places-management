@@ -34,98 +34,101 @@ import io.swagger.annotations.ApiOperation;
 @RestController
 @RequestMapping("api/places")
 public class PlaceController {
-	
+
 	@Autowired
 	private PlaceService placeService;
-	
+
 	@GetMapping(params = "name")
 	@ApiOperation(value = "Route to find a place by it's name on the API")
-	public ResponseEntity<Response<List<PlaceDto>>> getByName(@RequestParam(value = "name") String name,@PageableDefault(page = 0, size = 10) Pageable pageable) throws PlaceNotFoundException{
-		
+	public ResponseEntity<Response<List<PlaceDto>>> getByName(@RequestParam(value = "name") String name,
+			@PageableDefault(page = 0, size = 10) Pageable pageable) throws PlaceNotFoundException {
+
 		Response<List<PlaceDto>> response = new Response<>();
-		
+
 		Optional<List<Place>> place = placeService.findByName(name, pageable);
-		if(place.get().isEmpty()) {
+		if (place.get().isEmpty()) {
 			throw new PlaceNotFoundException("No place was found with the name: " + name);
 		}
-		
+
 		List<PlaceDto> placeDto = PlaceDto.listConverter(place.get());
 		response.setData(placeDto);
 		return ResponseEntity.ok(response);
-		
+
 	}
-	
+
 	@GetMapping
 	@ApiOperation(value = "Route to find all places of the API")
-	public ResponseEntity<Response<Page<PlaceDto>>> getAll(@PageableDefault(page = 0, size = 10) Pageable pageable){
-		
+	public ResponseEntity<Response<Page<PlaceDto>>> getAll(@PageableDefault(page = 0, size = 10) Pageable pageable) {
+
 		Response<Page<PlaceDto>> response = new Response<>();
-		
+
 		Page<Place> places = placeService.findAll(pageable);
 		Page<PlaceDto> dto = PlaceDto.pageConverter(places);
-		
+
 		response.setData(dto);
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@PostMapping
 	@ApiOperation(value = "Route to create places")
-	public ResponseEntity<Response<PlaceDto>> save(@RequestBody @Valid PlaceDto dto, BindingResult result, UriComponentsBuilder uriBuilder) throws InvalidPlaceException {
-		
+	public ResponseEntity<Response<PlaceDto>> save(@RequestBody @Valid PlaceDto dto, BindingResult result,
+			UriComponentsBuilder uriBuilder) throws InvalidPlaceException {
+
 		Response<PlaceDto> response = new Response<>();
-		
-		if(result.hasErrors()) {
+
+		if (result.hasErrors()) {
 			throw new InvalidPlaceException(result);
 		}
-		
+
 		Place place = dto.convertDtoToEntity();
 		Place savedPlace = placeService.save(place);
-		
+
 		PlaceDto savedDto = new PlaceDto(savedPlace);
-		
+
 		URI uri = uriBuilder.path("/api/places/{id}").buildAndExpand(place.getId()).toUri();
-		
+
 		response.setData(savedDto);
 		return ResponseEntity.created(uri).body(response);
-		
+
 	}
-	
+
 	@GetMapping("/{id}")
 	@ApiOperation(value = "Route to find a place by it's id on the API")
 	public ResponseEntity<Response<PlaceDto>> getById(@PathVariable Integer id) throws PlaceNotFoundException {
-		
+
 		Response<PlaceDto> response = new Response<>();
-		
-		if(!placeService.existsById(id)) {
+
+		if (!placeService.existsById(id)) {
 			throw new PlaceNotFoundException("No place was found with the id: " + id);
 		}
-		
+
 		Place place = placeService.getPlaceById(id);
 		PlaceDto dto = new PlaceDto(place);
-		
+
 		response.setData(dto);
 		return ResponseEntity.ok(response);
-		
+
 	}
-	
+
 	@PutMapping("/{id}")
 	@ApiOperation(value = "Route to update a place")
 	@Transactional
-	public ResponseEntity<Response<PlaceDto>> update(@PathVariable Integer id,@RequestBody @Valid PlaceDto dto) throws PlaceNotFoundException {
-		
+	public ResponseEntity<Response<PlaceDto>> update(@PathVariable Integer id, @RequestBody @Valid PlaceDto dto)
+			throws PlaceNotFoundException {
+
 		Response<PlaceDto> response = new Response<>();
-		
-		if(!placeService.existsById(id)) {
+
+		if (!placeService.existsById(id)) {
 			throw new PlaceNotFoundException("No place was found with the id: " + id);
 		}
-		
+
 		dto.setId(id);
-		
+
 		Place placeToUpdate = placeService.getPlaceById(id);
 		placeToUpdate.updatePlace(dto);
 		placeService.save(placeToUpdate);
 		PlaceDto updatedDto = new PlaceDto(placeToUpdate);
-		
+
 		response.setData(updatedDto);
 		return ResponseEntity.ok(response);
 	}
