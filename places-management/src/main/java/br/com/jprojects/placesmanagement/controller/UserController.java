@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,7 +21,6 @@ import br.com.jprojects.placesmanagement.dto.response.Response;
 import br.com.jprojects.placesmanagement.exception.InvalidUserException;
 import br.com.jprojects.placesmanagement.model.User;
 import br.com.jprojects.placesmanagement.service.UserService;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("/api/users")

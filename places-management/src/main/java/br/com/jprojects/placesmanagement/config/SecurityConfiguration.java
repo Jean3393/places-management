@@ -32,7 +32,7 @@ public class SecurityConfiguration {
 			.csrf()
 			.disable()
 			.authorizeHttpRequests()
-			.antMatchers("/api/auth", "/api/users", "/api/places")
+			.antMatchers("/api/auth", "/api/places")
 			.permitAll()
 			.anyRequest().authenticated()
 			.and()

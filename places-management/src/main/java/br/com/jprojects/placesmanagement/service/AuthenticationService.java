@@ -27,12 +27,12 @@ public class AuthenticationService {
 	public TokenDto authenticate(JwtUserDto dto) {
 		authenticationManager.authenticate(
 				new UsernamePasswordAuthenticationToken(
-						dto.getUsername(), 
+						dto.getEmail(), 
 						dto.getPassword()
 				)
 		);
 		
-		UserDetails user = userDetailsService.loadUserByUsername(dto.getUsername());
+		UserDetails user = userDetailsService.loadUserByUsername(dto.getEmail());
 		String token = jwtService.generateToken(user);
 		
 		return new TokenDto(token);
