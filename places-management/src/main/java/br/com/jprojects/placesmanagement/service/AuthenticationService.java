@@ -2,9 +2,11 @@ package br.com.jprojects.placesmanagement.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import br.com.jprojects.placesmanagement.dto.model.JwtUserDto;
@@ -25,12 +27,17 @@ public class AuthenticationService {
 	}
 
 	public TokenDto authenticate(JwtUserDto dto) {
-		authenticationManager.authenticate(
-				new UsernamePasswordAuthenticationToken(
-						dto.getEmail(), 
-						dto.getPassword()
-				)
-		);
+		try {
+			authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(
+							dto.getEmail(), 
+							dto.getPassword()
+					)
+			);
+		} catch (BadCredentialsException exception) {
+			throw new UsernameNotFoundException("Invalid username/password.");
+		}
+		
 		
 		UserDetails user = userDetailsService.loadUserByUsername(dto.getEmail());
 		String token = jwtService.generateToken(user);

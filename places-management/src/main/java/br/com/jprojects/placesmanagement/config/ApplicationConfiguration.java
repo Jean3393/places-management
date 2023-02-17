@@ -12,21 +12,21 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import br.com.jprojects.placesmanagement.repository.UserRepository;
+import br.com.jprojects.placesmanagement.service.impl.UserServiceImpl;
 
 @Configuration
 public class ApplicationConfiguration {
 	
-	private final UserRepository repository;
+	private final UserServiceImpl userService;
 	
 	@Autowired
-	public ApplicationConfiguration(UserRepository repository) {
-		this.repository = repository;
+	public ApplicationConfiguration(UserServiceImpl userService) {
+		this.userService = userService;
 	}
 	
 	@Bean
 	public UserDetailsService userDetailsService() {
-		return username -> repository.findByEmail(username)
+		return username -> userService.findByEmail(username)
 				.orElseThrow(() -> new UsernameNotFoundException("User not found."));
 	}
 	
