@@ -30,14 +30,14 @@ Further instructions being made.
 
 Endpoints provided by this API:
 
-	* `POST` request - Registering an user: `api/users`
-	* `GET` request - Getting all users: `api/users`
-	* `POST` request - Authenticating an user: `api/auth`
-	* `POST` request - Creating a place: `api/places`
-	* `PUT` request - Updating a place by id: `api/places/1`
-	* `GET` request - Getting an unique place by id: `api/places/1`
-	* `GET` request - Getting an unique place by name: `/api/places?name=foo`
-	* `GET` request - Getting all places: `api/places`
+	* 'POST' request - Registering an user: `api/users`
+	* 'GET' request - Getting all users: `api/users`
+	* 'POST' request - Authenticating an user: `api/auth`
+	* 'POST' request - Creating a place: `api/places`
+	* 'PUT' request - Updating a place by id: `api/places/1`
+	* 'GET' request - Getting an unique place by id: `api/places/1`
+	* 'GET' request - Getting an unique place by name: `/api/places?name=foo`
+	* 'GET' request - Getting all places: `api/places`
 
 ### Details
 
