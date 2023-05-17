@@ -3,6 +3,7 @@ package br.com.jprojects.placesmanagement.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -15,33 +16,36 @@ import br.com.jprojects.placesmanagement.filter.JwtAuthenticationFilter;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfiguration {
-	
+
 	private final JwtAuthenticationFilter jwtAuthFilter;
 	private final AuthenticationProvider authenticationProvider;
-	
+
 	@Autowired
 	public SecurityConfiguration(JwtAuthenticationFilter jwtAuthFilter, AuthenticationProvider authenticationProvider) {
 		this.jwtAuthFilter = jwtAuthFilter;
 		this.authenticationProvider = authenticationProvider;
 	}
-	
+
 	@Bean
+	@Profile("!test")
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		
-		http
-			.csrf()
-			.disable()
-			.authorizeHttpRequests()
-			.antMatchers("/api/auth/**", "/api/users/**", "/configuration/security", "/webjars/**", 
-        			"/v2/api-docs", "/swagger-resources/**", "/swagger-ui/**", "/manage/**")
-			.permitAll()
-			.anyRequest().authenticated()
-			.and()
-			.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-			.and()
-			.authenticationProvider(authenticationProvider)
-			.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-		
+		http.csrf().disable().authorizeHttpRequests()
+				.antMatchers("/api/auth/**", "/api/users/**", "/configuration/security", "/webjars/**", "/v2/api-docs",
+						"/swagger-resources/**", "/swagger-ui/**", "/manage/**")
+				.permitAll().anyRequest().authenticated().and().sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+				.authenticationProvider(authenticationProvider)
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+		return http.build();
+	}
+
+	@Bean
+	@Profile("test")
+	public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
+
+		http.csrf().disable().authorizeHttpRequests().anyRequest().permitAll();
 		return http.build();
 	}
 

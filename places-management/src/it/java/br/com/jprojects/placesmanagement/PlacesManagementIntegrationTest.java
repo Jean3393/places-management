@@ -42,5 +42,18 @@ public class PlacesManagementIntegrationTest {
 		assertEquals(201, responseEntity.getStatusCodeValue());
 
 	}
+	
+	@Test
+	@Order(2)
+	public void getPlace() {
+		
+		HttpEntity<String> entityRequest = new HttpEntity<String>("");
+
+		ResponseEntity<String> responseEntity = this.restTemplate
+				.exchange("http://localhost:" + this.port + "/api/places/1", HttpMethod.GET, entityRequest, String.class);
+		
+		assertEquals(200, responseEntity.getStatusCodeValue());
+		
+	}
 
 }
