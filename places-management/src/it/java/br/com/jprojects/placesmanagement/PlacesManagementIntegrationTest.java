@@ -38,7 +38,7 @@ public class PlacesManagementIntegrationTest {
 
 	@Test
 	@Order(1)
-	public void createUser() {
+	public void testCreateUser() {
 		UserDto userDto = new UserDto("New User", "userPassword", "test@email.com", "ROLE_USER");
 
 		HttpEntity<UserDto> entityRequest = new HttpEntity<UserDto>(userDto);
@@ -52,7 +52,7 @@ public class PlacesManagementIntegrationTest {
 
 	@Test
 	@Order(2)
-	public void authenticatingUser() throws JSONException {
+	public void testAuthenticateUser() throws JSONException {
 		JwtUserDto dto = new JwtUserDto("test@email.com", "userPassword");
 
 		HttpEntity<JwtUserDto> entityRequest = new HttpEntity<JwtUserDto>(dto);
@@ -71,7 +71,7 @@ public class PlacesManagementIntegrationTest {
 
 	@Test
 	@Order(3)
-	public void savePlace() {
+	public void testSavePlace() {
 		PlaceDto dto = new PlaceDto("Place One", "Nice Place", "City One", "State One");
 
 		HttpEntity<PlaceDto> entityRequest = new HttpEntity<PlaceDto>(dto);
@@ -80,12 +80,12 @@ public class PlacesManagementIntegrationTest {
 				"http://localhost:" + this.port + "/api/places", HttpMethod.POST, entityRequest, String.class);
 
 		assertEquals(201, responseEntity.getStatusCodeValue());
-		
+
 	}
 
 	@Test
 	@Order(4)
-	public void getAllPlaces() throws JSONException {
+	public void testGetAllPlaces() throws JSONException {
 
 		PlaceDto dto1 = new PlaceDto("Place Two", "Great Place", "City Two", "State Two");
 		PlaceDto dto2 = new PlaceDto("Place Three", "Amazing Place", "City Three", "State Three");
@@ -102,28 +102,43 @@ public class PlacesManagementIntegrationTest {
 		HttpEntity<String> entityRequest = new HttpEntity<String>("");
 		ResponseEntity<String> responseEntity = this.restTemplate
 				.exchange("http://localhost:" + this.port + "/api/places", HttpMethod.GET, entityRequest, String.class);
-		
+
 		JSONObject object = new JSONObject(responseEntity.getBody());
 		int numberOfSavedPlaces = object.getJSONObject("data").getInt("totalElements");
-		
+
 		assertEquals(3, numberOfSavedPlaces);
 
 	}
-	
+
 	@Test
 	@Order(5)
-	public void updateAPlace() throws JSONException {
+	public void testUpdateAPlace() throws JSONException {
 		String newSlug = "Astonishing Updated Place";
 		PlaceDto dto = new PlaceDto("Place Three", newSlug, "City Three", "State Three");
-		
+
 		HttpEntity<PlaceDto> entityRequest = new HttpEntity<PlaceDto>(dto);
-		ResponseEntity<String> responseEntity = this.restTemplate
-				.exchange("http://localhost:" + this.port + "/api/places/3", HttpMethod.PUT, entityRequest, String.class);
-		
+		ResponseEntity<String> responseEntity = this.restTemplate.exchange(
+				"http://localhost:" + this.port + "/api/places/3", HttpMethod.PUT, entityRequest, String.class);
+
 		JSONObject object = new JSONObject(responseEntity.getBody());
 		String updatedSlug = object.getJSONObject("data").getString("slug");
-		
+
 		assertEquals(newSlug, updatedSlug);
+	}
+
+	@Test
+	@Order(6)
+	public void testGetPlaceByName() throws JSONException {
+		String placeName = "Place Two";
+
+		HttpEntity<String> entityRequest = new HttpEntity<>("");
+		ResponseEntity<String> responseEntity = this.restTemplate.exchange("http://localhost:" + this.port + "/api/places?name=" + placeName, HttpMethod.GET,
+				entityRequest, String.class);
+		
+		JSONObject object = new JSONObject(responseEntity.getBody());
+		int placeId = object.getJSONArray("data").getJSONObject(0).getInt("id");
+		
+		assertEquals(2, placeId);
 	}
 
 }
