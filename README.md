@@ -63,7 +63,13 @@ Returns the data on the response body:
     "name":"User 1",
     "password":"encryptedPassword",
     "email":"test@email.com",    
-    "role":"ROLE_USER"
+    "role":"ROLE_USER",
+    "links": [
+        {
+            "rel": "self",
+            "href": "http://localhost:8080/api/users/1"
+        }
+    ]
   }
 }
 ```
@@ -73,6 +79,7 @@ Returns the data on the response body:
 `password` - The saved encrypted password.
 `email` - The user email, used as username when authenticating.
 `role` - The selected user role. Can be "ROLE_USER" or "ROLE_ADMIN".
+`links` - An URL link automatically generated of the self entity.
 
 	`POST/api/auth`
 
@@ -119,7 +126,13 @@ Returns the created place on the response body.
     "city": "Great City",
     "state": "Old State",
     "createdAt": "2023-02-26T11:15:49.7246388",
-    "updatedAt": null
+    "updatedAt": null,
+    "links": [
+        {
+            "rel": "self",
+            "href": "http://localhost:8080/api/places/1"
+        }
+    ]
   }
 }
 ```
@@ -131,6 +144,7 @@ Returns the created place on the response body.
 `state` - State where the place is.
 `createdAt` - Date time in the ISO 8601 format YYYY-MM-DDThh:mm:ss.ssssss in the Local time zone when the place was created.
 `updatedAt` - Date time in the ISO 8601 format YYYY-MM-DDThh:mm:ss.ssssss in the Local time zone for when the place is updated.
+`links` - An URL link automatically generated of the self entity.
 
 *Responses*
 
