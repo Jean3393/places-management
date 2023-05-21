@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
@@ -51,6 +53,12 @@ public class PlaceController {
 		}
 
 		List<PlaceDto> placeDto = PlaceDto.listConverter(place.get());
+		
+		placeDto.forEach(dto -> {
+			Link link = WebMvcLinkBuilder.linkTo(PlaceController.class).slash(dto.getId()).withSelfRel();
+			dto.add(link);
+		});
+		
 		response.setData(placeDto);
 		return ResponseEntity.ok(response);
 
@@ -64,6 +72,11 @@ public class PlaceController {
 
 		Page<Place> places = placeService.findAll(pageable);
 		Page<PlaceDto> dto = PlaceDto.pageConverter(places);
+		
+		dto.forEach(placeDto -> {
+			Link link = WebMvcLinkBuilder.linkTo(PlaceController.class).slash(placeDto.getId()).withSelfRel();
+			placeDto.add(link);
+		});
 
 		response.setData(dto);
 		return ResponseEntity.ok(response);
@@ -86,6 +99,9 @@ public class PlaceController {
 		PlaceDto savedDto = new PlaceDto(savedPlace);
 
 		URI uri = uriBuilder.path("/api/places/{id}").buildAndExpand(place.getId()).toUri();
+		
+		Link link = WebMvcLinkBuilder.linkTo(PlaceController.class).slash(savedDto.getId()).withSelfRel();
+		savedDto.add(link);
 
 		response.setData(savedDto);
 		return ResponseEntity.created(uri).body(response);
@@ -104,6 +120,9 @@ public class PlaceController {
 
 		Place place = placeService.getPlaceById(id);
 		PlaceDto dto = new PlaceDto(place);
+		
+		Link link = WebMvcLinkBuilder.linkTo(PlaceController.class).slash(place.getId()).withSelfRel();
+		dto.add(link);
 
 		response.setData(dto);
 		return ResponseEntity.ok(response);
@@ -128,6 +147,9 @@ public class PlaceController {
 		placeToUpdate.updatePlace(dto);
 		placeService.save(placeToUpdate);
 		PlaceDto updatedDto = new PlaceDto(placeToUpdate);
+		
+		Link link = WebMvcLinkBuilder.linkTo(PlaceController.class).slash(updatedDto.getId()).withSelfRel();
+		updatedDto.add(link);
 
 		response.setData(updatedDto);
 		return ResponseEntity.ok(response);

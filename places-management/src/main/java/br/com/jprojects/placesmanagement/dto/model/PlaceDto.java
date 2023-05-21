@@ -8,10 +8,11 @@ import javax.validation.constraints.NotBlank;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.RepresentationModel;
 
 import br.com.jprojects.placesmanagement.model.Place;
 
-public class PlaceDto {
+public class PlaceDto extends RepresentationModel<PlaceDto>{
 	
 	private int id;
 	@NotBlank(message = "Insert a name for the place.")

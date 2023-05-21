@@ -9,10 +9,11 @@ import javax.validation.constraints.Pattern;
 
 import org.hibernate.validator.constraints.Length;
 import org.modelmapper.ModelMapper;
+import org.springframework.hateoas.RepresentationModel;
 
 import br.com.jprojects.placesmanagement.model.User;
 
-public class UserDto {
+public class UserDto extends RepresentationModel<UserDto>{
 	
 	private int id;
 	@NotBlank(message = "Name cannot be null.")

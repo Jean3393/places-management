@@ -1,15 +1,14 @@
 package br.com.jprojects.placesmanagement.controller;
 
-import java.util.List;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.server.mvc.WebMvcLinkBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -32,17 +31,6 @@ public class UserController {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	@GetMapping
-	public ResponseEntity<Response<List<UserDto>>> getAll() {
-		Response<List<UserDto>> response = new Response<>();
-
-		List<User> users = userService.findAll();
-		List<UserDto> dto = UserDto.listConverter(users);
-
-		response.setData(dto);
-		return ResponseEntity.ok(response);
-	}
-
 	@PostMapping
 	public ResponseEntity<Response<UserDto>> register(@RequestBody @Valid UserDto dto, BindingResult result,
 			UriComponentsBuilder uriBuilder) throws InvalidUserException {
@@ -58,6 +46,9 @@ public class UserController {
 		User savedUser = userService.save(user);
 
 		UserDto savedDto = new UserDto(savedUser);
+		
+		Link link = WebMvcLinkBuilder.linkTo(UserController.class).slash(savedDto.getId()).withSelfRel();
+		savedDto.add(link);
 
 		response.setData(savedDto);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
