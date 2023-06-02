@@ -1,5 +1,6 @@
 package br.com.jprojects.placesmanagement.model;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
@@ -12,8 +13,10 @@ import org.modelmapper.ModelMapper;
 import br.com.jprojects.placesmanagement.dto.model.PlaceDto;
 
 @Entity
-public class Place {
+public class Place implements Serializable {
 	
+	private static final long serialVersionUID = 7242650588765795327L;
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;

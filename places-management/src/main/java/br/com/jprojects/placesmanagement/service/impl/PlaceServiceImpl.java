@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ public class PlaceServiceImpl implements PlaceService {
 	}
 	
 	@Override
+	@Cacheable(value = "allPlacesCache", key = "#pageable")
 	public Page<Place> findAll(Pageable pageable) {
 		return placeRepository.findAll(pageable);
 	}
@@ -43,8 +45,9 @@ public class PlaceServiceImpl implements PlaceService {
 	}
 	
 	@Override
+	@Cacheable(value = "placeIdCache", key = "#id")
 	public Place getPlaceById(Integer id) {
-		return placeRepository.getReferenceById(id);
+		return placeRepository.findById(id).get();
 	}
 
 }

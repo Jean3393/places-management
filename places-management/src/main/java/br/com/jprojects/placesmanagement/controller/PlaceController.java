@@ -77,7 +77,7 @@ public class PlaceController {
 			Link link = WebMvcLinkBuilder.linkTo(PlaceController.class).slash(placeDto.getId()).withSelfRel();
 			placeDto.add(link);
 		});
-
+		
 		response.setData(dto);
 		return ResponseEntity.ok(response);
 	}
