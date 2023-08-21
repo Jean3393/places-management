@@ -29,7 +29,7 @@ public class PlaceServiceImpl implements PlaceService {
 	}
 	
 	@Override
-	@Cacheable(value = "allPlacesCache", key = "#pageable")
+	@Cacheable(value = "allPlacesCache", key = "#pageable", unless = "#result==null")
 	public Page<Place> findAll(Pageable pageable) {
 		return placeRepository.findAll(pageable);
 	}
@@ -45,9 +45,9 @@ public class PlaceServiceImpl implements PlaceService {
 	}
 	
 	@Override
-	@Cacheable(value = "placeIdCache", key = "#id")
+	@Cacheable(value = "placeIdCache", key = "#id", unless = "#result==null")
 	public Place getPlaceById(Integer id) {
-		return placeRepository.findById(id).get();
+		return placeRepository.getReferenceById(id);
 	}
 
 }
